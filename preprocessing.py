@@ -15,10 +15,13 @@ writeCSV = csv.writer(writecsv)
 
 header = readCSV.next()
 writeCSV.writerow(header[0:9])
+writeCSV.writerow(["datetime","int","int","int","int","int","int","int","int"])
+writeCSV.writerow(["T","","","","","","","",""])
+
 
 for row in readCSV:
     timestamp = float(row[0])
-    dt = datetime.datetime.fromtimestamp(timestamp).isoformat()
+    dt = datetime.datetime.fromtimestamp(timestamp)
     updated_row = row
     updated_row[0] = dt
     final_output = updated_row[0:9];

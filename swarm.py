@@ -1,9 +1,10 @@
 #!usr/bin/env python
 import os
+import logging
 
 from nupic.swarming import permutations_runner
 from swarm_description import SWARM_DESCRIPTION
-
+logging.basicConfig()
 
 def swarm(inputFile):
 
@@ -13,7 +14,7 @@ def swarm(inputFile):
 
     permutations_runner.runWithConfig(
         SWARM_DESCRIPTION,
-        {"maxWorkers":4, "overwrite":True},
+        {'maxWorkers': 4, 'overwrite': True},
         outputLabel = "network_output",
         outDir=swarmWorkDir,
         permWorkDir=swarmWorkDir
@@ -25,5 +26,5 @@ def swarm(inputFile):
 
 
 
-if __name__ = "__main__":
-    swarm("test.csv")
+if __name__ == "__main__":
+    swarm("updated_test.csv")
