@@ -11,6 +11,8 @@ from nupic.frameworks.opf.prediction_metrics_manager import MetricsManager
 
 import nupic_output
 
+from model_params import model_params
+
 
 DESCRIPTION = (
   "Starts a NuPIC model from the model params returned by the swarm\n"
@@ -24,7 +26,8 @@ GYM_NAME = "network"  # or use "rec-center-every-15m-large"
 DATA_DIR = "."
 MODEL_PARAMS_DIR = "./model_params"
 # '7/2/10 0:00'
-DATE_FORMAT = "%m/%d/%y %H:%M"
+#DATE_FORMAT = "%m/%d/%y %H:%M:%"
+DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 _METRIC_SPECS = (
     MetricSpec(field='total', metric='multiStep',
@@ -41,9 +44,9 @@ _METRIC_SPECS = (
                params={'errorMetric': 'altMAPE', 'window': 1000, 'steps': 1}),
 )
 
-def createModel(modelParams):
-  model = ModelFactory.create(modelParams)
-  model.enableInference({"predictedField": "kw_energy_consumption"})
+def createModel():
+  model = ModelFactory.create(model_params.MODEL_PARAMS)
+  model.enableInference({"predictedField": "total"})
   return model
 
 
@@ -96,13 +99,13 @@ def runIoThroughNupic(inputData, model, gymName, plot):
     result = model.run({
       "timestamp": timestamp,
       "total": total,
-      "total_tcp" = total_tcp,
-      "total_http" = total_http,
-      "total_udp" = total_udp,
-      "size" = size,
-      "size_tcp" = size_tcp,
-      "size_http" = size_http,
-      "size_udp" = size_udp
+      "total_tcp" : total_tcp,
+      "total_http" : total_http,
+      "total_udp" : total_udp,
+      "size" : size,
+      "size_tcp" : size_tcp,
+      "size_http" : size_http,
+      "size_udp" : size_udp
     })
 
     result.metrics = metricsManager.update(result)
@@ -118,7 +121,7 @@ def runIoThroughNupic(inputData, model, gymName, plot):
       result = shifter.shift(result)
 
     prediction = result.inferences["multiStepBestPredictions"][1]
-    output.write([timestamp], [total],[total_tcp],[total_http],[total_udp],[size],[size_tcp],[size_http],[size_udp], [prediction])
+    output.write([timestamp], [total], [prediction])
 
     if plot and counter % 2 == 0:
         output.refreshGUI()
@@ -130,7 +133,7 @@ def runIoThroughNupic(inputData, model, gymName, plot):
 
 def runModel(gymName, plot=False):
   print "Creating model from %s..." % gymName
-  model = createModel(getModelParamsFromName(gymName))
+  model = createModel()
   inputData = "%s/%s.csv" % (DATA_DIR, gymName.replace(" ", "_"))
   runIoThroughNupic(inputData, model, gymName, plot)
 

@@ -8,7 +8,7 @@ csv.field_size_limit(sys.maxsize)
 dataset = [];
 
 readcsvfile = open('test.csv')
-writecsv = open('updated_test.csv','w')
+writecsv = open('network.csv','w')
 
 readCSV = csv.reader(readcsvfile, delimiter=',')
 writeCSV = csv.writer(writecsv)
@@ -22,6 +22,7 @@ writeCSV.writerow(["T","","","","","","","",""])
 for row in readCSV:
     timestamp = float(row[0])
     dt = datetime.datetime.fromtimestamp(timestamp)
+    dt = dt.strftime('%Y-%m-%d %H:%M:%S')
     updated_row = row
     updated_row[0] = dt
     final_output = updated_row[0:9];
