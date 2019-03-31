@@ -8,7 +8,7 @@ from swarm_description import SWARM_DESCRIPTION
 logging.basicConfig()
 
 def writeModelParams(modelParams):
-    outDir = os.path.join(os.getcwd(),"model_params")
+    outDir = os.path.join(os.getcwd(),"models_params")
     if not os.path.exists(outDir):
         os.mkdir(outDir)
     outPath = os.path.join(outDir, "model_params.py")
