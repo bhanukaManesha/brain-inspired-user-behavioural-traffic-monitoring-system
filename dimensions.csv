@@ -1,0 +1,1 @@
+timestamp,total,total_tcp,total_http,total_udp,size,size_tcp,size_http,size_udp,ip_src,ip_src_tcp,ip_src_http,ip_src_udp,ip_dst,ip_dst_tcp,ip_dst_http,ip_dst_udp,port_src,port_src_tcp,port_src_udp,port_dst,port_dst_tcp,port_dst_udp,mac_src,mac_dst
