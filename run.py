@@ -1,0 +1,145 @@
+
+import importlib
+import sys
+import csv
+import datetime
+
+from nupic.data.inference_shifter import InferenceShifter
+from nupic.frameworks.opf.metrics import MetricSpec
+from nupic.frameworks.opf.model_factory import ModelFactory
+from nupic.frameworks.opf.prediction_metrics_manager import MetricsManager
+
+import nupic_output
+
+
+DESCRIPTION = (
+  "Starts a NuPIC model from the model params returned by the swarm\n"
+  "and pushes each line of input from the gym into the model. Results\n"
+  "are written to an output file (default) or plotted dynamically if\n"
+  "the --plot option is specified.\n"
+  "NOTE: You must run ./swarm.py before this, because model parameters\n"
+  "are required to run NuPIC.\n"
+)
+GYM_NAME = "network"  # or use "rec-center-every-15m-large"
+DATA_DIR = "."
+MODEL_PARAMS_DIR = "./model_params"
+# '7/2/10 0:00'
+DATE_FORMAT = "%m/%d/%y %H:%M"
+
+_METRIC_SPECS = (
+    MetricSpec(field='total', metric='multiStep',
+               inferenceElement='multiStepBestPredictions',
+               params={'errorMetric': 'aae', 'window': 1000, 'steps': 1}),
+    MetricSpec(field='total', metric='trivial',
+               inferenceElement='prediction',
+               params={'errorMetric': 'aae', 'window': 1000, 'steps': 1}),
+    MetricSpec(field='total', metric='multiStep',
+               inferenceElement='multiStepBestPredictions',
+               params={'errorMetric': 'altMAPE', 'window': 1000, 'steps': 1}),
+    MetricSpec(field='total', metric='trivial',
+               inferenceElement='prediction',
+               params={'errorMetric': 'altMAPE', 'window': 1000, 'steps': 1}),
+)
+
+def createModel(modelParams):
+  model = ModelFactory.create(modelParams)
+  model.enableInference({"predictedField": "kw_energy_consumption"})
+  return model
+
+
+
+def getModelParamsFromName(gymName):
+  importName = "model_params.%s_model_params" % (
+    gymName.replace(" ", "_").replace("-", "_")
+  )
+  print "Importing model params from %s" % importName
+  try:
+    importedModelParams = importlib.import_module(importName).MODEL_PARAMS
+  except ImportError:
+    raise Exception("No model params exist for '%s'. Run swarm first!"
+                    % gymName)
+  return importedModelParams
+
+
+
+def runIoThroughNupic(inputData, model, gymName, plot):
+  inputFile = open(inputData, "rb")
+  csvReader = csv.reader(inputFile)
+  # skip header rows
+  csvReader.next()
+  csvReader.next()
+  csvReader.next()
+
+  shifter = InferenceShifter()
+  if plot:
+    output = nupic_output.NuPICPlotOutput([gymName])
+  else:
+    output = nupic_output.NuPICFileOutput([gymName])
+
+  metricsManager = MetricsManager(_METRIC_SPECS, model.getFieldInfo(),
+                                  model.getInferenceType())
+
+  counter = 0
+  for row in csvReader:
+    counter += 1
+
+    timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
+    total = int(row[1])
+    total_tcp = int(row[2])
+    total_http = int(row[3])
+    total_udp = int(row[4])
+    size = int(row[5])
+    size_tcp = int(row[6])
+    size_http = int(row[7])
+    size_udp = int(row[8])
+
+    result = model.run({
+      "timestamp": timestamp,
+      "total": total,
+      "total_tcp" = total_tcp,
+      "total_http" = total_http,
+      "total_udp" = total_udp,
+      "size" = size,
+      "size_tcp" = size_tcp,
+      "size_http" = size_http,
+      "size_udp" = size_udp
+    })
+
+    result.metrics = metricsManager.update(result)
+
+    if counter % 100 == 0:
+      print "Read %i lines..." % counter
+      print ("After %i records, 1-step altMAPE=%f" % (counter,
+              result.metrics["multiStepBestPredictions:multiStep:"
+                             "errorMetric='altMAPE':steps=1:window=1000:"
+                             "field=total"]))
+
+    if plot:
+      result = shifter.shift(result)
+
+    prediction = result.inferences["multiStepBestPredictions"][1]
+    output.write([timestamp], [total],[total_tcp],[total_http],[total_udp],[size],[size_tcp],[size_http],[size_udp], [prediction])
+
+    if plot and counter % 2 == 0:
+        output.refreshGUI()
+
+  inputFile.close()
+  output.close()
+
+
+
+def runModel(gymName, plot=False):
+  print "Creating model from %s..." % gymName
+  model = createModel(getModelParamsFromName(gymName))
+  inputData = "%s/%s.csv" % (DATA_DIR, gymName.replace(" ", "_"))
+  runIoThroughNupic(inputData, model, gymName, plot)
+
+
+
+if __name__ == "__main__":
+  print DESCRIPTION
+  plot = False
+  args = sys.argv[1:]
+  if "--plot" in args:
+    plot = True
+  runModel(GYM_NAME, plot=plot)
