@@ -75,6 +75,6 @@ SWARM_DESCRIPTION = {
     ],
     "predictedField" : "total"
 },
-"iterationCount":-1,
-"swarmSize":"medium"
+"iterationCount":1,
+"swarmSize":"small"
 }
