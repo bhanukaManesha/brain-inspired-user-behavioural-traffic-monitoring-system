@@ -117,7 +117,7 @@ def runIoThroughNupic(inputData, model, gymName, plot):
                              "errorMetric='altMAPE':steps=1:window=1000:"
                              "field=total"]))
 
-    
+
     result = shifter.shift(result)
 
     prediction = result.inferences["multiStepBestPredictions"][1]

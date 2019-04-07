@@ -29,7 +29,7 @@ for row in csvReader:
   counter += 1
   #
   timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
-  total = int(row[1])
+  total = float(row[1])
   prediction = float(row[2])
   # total_tcp = int(row[2])
   # total_http = int(row[3])
@@ -53,8 +53,8 @@ for row in csvReader:
 
   # result.metrics = metricsManager.update(result)
 
-  if counter % 2 == 0:
-    print "Read %i lines..." % counter
+
+  print "Read %i lines..." % counter
     # print ("After %i records, 1-step altMAPE=%f" % (counter,
     #         result.metrics["multiStepBestPredictions:multiStep:"
     #                        "errorMetric='altMAPE':steps=1:window=1000:"
