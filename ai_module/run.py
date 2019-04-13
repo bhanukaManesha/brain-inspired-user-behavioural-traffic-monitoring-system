@@ -25,8 +25,7 @@ DESCRIPTION = (
 GYM_NAME = "network"  # or use "rec-center-every-15m-large"
 DATA_DIR = "."
 MODEL_PARAMS_DIR = "./model_params"
-# '7/2/10 0:00'
-#DATE_FORMAT = "%m/%d/%y %H:%M:%"
+
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 _METRIC_SPECS = (
