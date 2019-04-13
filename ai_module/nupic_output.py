@@ -69,7 +69,7 @@ class NuPICFileOutput(NuPICOutput):
     self.outputFiles = []
     self.outputWriters = []
     self.lineCounts = []
-    headerRow = ['timestamp', 'kw_energy_consumption', 'prediction']
+    headerRow = ['timestamp', 'ground_truth', 'prediction']
     for name in self.names:
       self.lineCounts.append(0)
       outputFileName = "%s_out.csv" % name

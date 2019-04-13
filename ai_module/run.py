@@ -133,7 +133,7 @@ def runIoThroughNupic(inputData, model, gymName, plot):
 def runModel(gymName, plot=False):
   print "Creating model from %s..." % gymName
   model = createModel()
-  inputData = "%s/%s.csv" % (DATA_DIR, gymName.replace(" ", "_"))
+  inputData = "%s/csv/%s.csv" % (DATA_DIR, gymName.replace(" ", "_"))
   runIoThroughNupic(inputData, model, gymName, plot)
 
 
