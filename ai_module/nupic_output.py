@@ -73,7 +73,7 @@ class NuPICFileOutput(NuPICOutput):
     for name in self.names:
       self.lineCounts.append(0)
       outputFileName = "%s_out.csv" % name
-      print "Preparing to output %s data to %s" % (name, outputFileName)
+      # print "Preparing to output %s data to %s" % (name, outputFileName)
       outputFile = open(outputFileName, "w")
       self.outputFiles.append(outputFile)
       outputWriter = csv.writer(outputFile)
@@ -103,7 +103,7 @@ class NuPICFileOutput(NuPICOutput):
   def close(self):
     for index, name in enumerate(self.names):
       self.outputFiles[index].close()
-      print "Done. Wrote %i data lines to %s." % (self.lineCounts[index], name)
+      # print "Done. Wrote %i data lines to %s." % (self.lineCounts[index], name)
 
 
 
@@ -129,7 +129,7 @@ class NuPICPlotOutput(NuPICOutput):
     for index in range(len(self.names)):
       self.graphs.append(fig.add_subplot(gs[index, 0]))
       plt.title(self.names[index])
-      plt.ylabel('KW Energy Consumption')
+      plt.ylabel('Prediction Label')
       plt.xlabel('Date')
     plt.tight_layout()
 
@@ -137,7 +137,7 @@ class NuPICPlotOutput(NuPICOutput):
 
   def initializeLines(self, timestamps):
     for index in range(len(self.names)):
-      print "initializing %s" % self.names[index]
+      # print "initializing %s" % self.names[index]
       # graph = self.graphs[index]
       self.dates.append(deque([timestamps[index]] * WINDOW, maxlen=WINDOW))
       self.convertedDates.append(deque(

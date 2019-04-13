@@ -7,17 +7,12 @@ GYM_NAME = "network"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
-
-
-
 inputFile = open("network_out.csv", "rb")
 csvReader = csv.reader(inputFile)
 # skip header rows
 csvReader.next()
 csvReader.next()
 csvReader.next()
-
-# shifter = InferenceShifter()
 
 output = nupic_output.NuPICPlotOutput([GYM_NAME])
 
@@ -27,7 +22,7 @@ output = nupic_output.NuPICPlotOutput([GYM_NAME])
 counter = 0
 for row in csvReader:
   counter += 1
-  #
+
   timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
   total = float(row[1])
   prediction = float(row[2])
@@ -51,21 +46,7 @@ for row in csvReader:
   #   "size_udp" : size_udp
   # })
 
-  # result.metrics = metricsManager.update(result)
-
-
-  print "Read %i lines..." % counter
-    # print ("After %i records, 1-step altMAPE=%f" % (counter,
-    #         result.metrics["multiStepBestPredictions:multiStep:"
-    #                        "errorMetric='altMAPE':steps=1:window=1000:"
-    #                        "field=total"]))
-
-  # result = shifter.shift(result)
-
-  # prediction = result.inferences["multiStepBestPredictions"][1]
   output.write([timestamp], [total], [prediction])
-
-
   output.refreshGUI()
 
 inputFile.close()
