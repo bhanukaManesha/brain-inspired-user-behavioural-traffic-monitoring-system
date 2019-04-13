@@ -122,62 +122,6 @@ config = {
     'name': '_classifierInput',
     'type': 'ScalarEncoder',
     'w': 21},
-  u'total_tcp':     {   'clipInput': True,
-    'fieldname': u'total_tcp',
-    'maxval': 143352,
-    'minval': 0,
-    'n': 100,
-    'name': u'total_tcp',
-    'type': 'ScalarEncoder',
-    'w': 21},
-  u'total_http':     {   'clipInput': True,
-    'fieldname': u'total_http',
-    'maxval': 7045,
-    'minval': 638,
-    'n': 100,
-    'name': u'total_http',
-    'type': 'ScalarEncoder',
-    'w': 21},
-  u'total_udp':     {   'clipInput': True,
-    'fieldname': u'total_udp',
-    'maxval': 638,
-    'minval': 11,
-    'n': 100,
-    'name': u'total_udp',
-    'type': 'ScalarEncoder',
-    'w': 21},
-  u'size':     {   'clipInput': True,
-    'fieldname': u'size',
-    'maxval': 15315931,
-    'minval': 13836,
-    'n': 100,
-    'name': u'size',
-    'type': 'ScalarEncoder',
-    'w': 21},
-  u'size_tcp':     {   'clipInput': True,
-    'fieldname': u'size_tcp',
-    'maxval': 15278447,
-    'minval': 0,
-    'n': 100,
-    'name': u'size_tcp',
-    'type': 'ScalarEncoder',
-    'w': 21},
-  u'size_http':     {   'clipInput': True,
-    'fieldname': u'size_http',
-    'maxval': 6090358,
-    'minval': 0,
-    'n': 100,
-    'name': u'size_http',
-    'type': 'ScalarEncoder',
-    'w': 21},
-  u'size_udp':     {   'clipInput': True,
-    'fieldname': u'size_udp',
-    'maxval': 68596,
-    'minval': 1024,
-    'n': 100,
-    'name': u'size_udp',
-    'type': 'ScalarEncoder',
-    'w': 21},
             },
 
             # A dictionary specifying the period for automatically-generated
@@ -334,7 +278,7 @@ config = {
 
             # This is set after the call to updateConfigFromSubConfig and is
             # computed from the aggregationInfo and predictAheadTime.
-            'steps': '1',
+            'steps': '5',
         },
 
         'anomalyParams': {   u'anomalyCacheRecords': None,
@@ -377,7 +321,7 @@ control = {
   'dataset' : {   u'info': u'network',
         u'streams': [   {   u'columns': [u'*'],
                             u'info': u'Network 1',
-                            u'source': u'file://updated_test.csv'}],
+                            u'source': u'file://csv/network.csv'}],
         u'version': 1},
 
   # Iteration count: maximum number of iterations.  Each iteration corresponds
@@ -393,13 +337,13 @@ control = {
   # A dictionary containing all the supplementary parameters for inference
   "inferenceArgs":{u'inputPredictedField': 'auto',
  u'predictedField': u'total',
- u'predictionSteps': [1]},
+ u'predictionSteps': [5]},
 
   # Metrics: A list of MetricSpecs that instantiate the metrics that are
   # computed for this experiment
   'metrics':[
-    MetricSpec(field=u'total', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'aae'}),
-    MetricSpec(field=u'total', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'altMAPE'})
+    MetricSpec(field=u'total', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [5], 'errorMetric': 'aae'}),
+    MetricSpec(field=u'total', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [5], 'errorMetric': 'altMAPE'})
   ],
 
   # Logged Metrics: A sequence of regular expressions that specify which of

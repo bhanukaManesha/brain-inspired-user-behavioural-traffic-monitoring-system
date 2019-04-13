@@ -61,13 +61,6 @@ permutations = {
   u'timestamp_weekend': PermuteEncoder(encoderClass='DateEncoder.weekend', radius=PermuteChoices([1]),  w=21, fieldName='timestamp', ),
   u'total': PermuteEncoder(maxval=143909, fieldName='total', w=21, clipInput=True, minval=187, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
   '_classifierInput': dict(maxval=143909, classifierOnly=True, clipInput=True, minval=187, n=PermuteInt(28, 521), fieldname='total', w=21, type='ScalarEncoder', ),
-  u'total_tcp': PermuteEncoder(maxval=143352, fieldName='total_tcp', w=21, clipInput=True, minval=0, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
-  u'total_http': PermuteEncoder(maxval=7045, fieldName='total_http', w=21, clipInput=True, minval=638, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
-  u'total_udp': PermuteEncoder(maxval=638, fieldName='total_udp', w=21, clipInput=True, minval=11, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
-  u'size': PermuteEncoder(maxval=15315931, fieldName='size', w=21, clipInput=True, minval=13836, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
-  u'size_tcp': PermuteEncoder(maxval=15278447, fieldName='size_tcp', w=21, clipInput=True, minval=0, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
-  u'size_http': PermuteEncoder(maxval=6090358, fieldName='size_http', w=21, clipInput=True, minval=0, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
-  u'size_udp': PermuteEncoder(maxval=68596, fieldName='size_udp', w=21, clipInput=True, minval=1024, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
       },
     },
 
@@ -103,8 +96,8 @@ report = [
 # used by RunPermutations.
 # NOTE: The value is used as a regular expressions by RunPermutations.py's
 #       report generator
-# (generated from minimize = "multiStepBestPredictions:multiStep:errorMetric='altMAPE':steps=\[1\]:window=1000:field=total")
-minimize = "multiStepBestPredictions:multiStep:errorMetric='altMAPE':steps=\[1\]:window=1000:field=total"
+# (generated from minimize = "multiStepBestPredictions:multiStep:errorMetric='altMAPE':steps=\[5\]:window=1000:field=total")
+minimize = "multiStepBestPredictions:multiStep:errorMetric='altMAPE':steps=\[5\]:window=1000:field=total"
 
 minParticlesPerSwarm = 5
 
