@@ -86,14 +86,14 @@ def runIoThroughNupic(inputData, model, gymName, plot):
     counter += 1
 
     timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
-    total = float(row[1])
-    total_tcp = float(row[2])
-    total_http = float(row[3])
-    total_udp = float(row[4])
-    size = float(row[5])
-    size_tcp = float(row[6])
-    size_http = float(row[7])
-    size_udp = float(row[8])
+    total = row[1]
+    total_tcp = row[2]
+    total_http = row[3]
+    total_udp = row[4]
+    size = row[5]
+    size_tcp = row[6]
+    size_http = row[7]
+    size_udp = row[8]
 
     result = model.run({
       "timestamp": timestamp,

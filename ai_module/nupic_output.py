@@ -199,5 +199,5 @@ class NuPICPlotOutput(NuPICOutput):
 
 
 
-NuPICOutput.register(NuPICFileOutput)
-NuPICOutput.register(NuPICPlotOutput)
+# NuPICOutput.register(NuPICFileOutput)
+# NuPICOutput.register(NuPICPlotOutput)

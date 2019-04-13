@@ -7,12 +7,12 @@ GYM_NAME = "network"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
-inputFile = open("network_out.csv", "rb")
+inputFile = open("network_out.csv", "r")
 csvReader = csv.reader(inputFile)
 # skip header rows
-csvReader.next()
-csvReader.next()
-csvReader.next()
+next(csvReader)
+next(csvReader)
+next(csvReader)
 
 output = nupic_output.NuPICPlotOutput([GYM_NAME])
 
