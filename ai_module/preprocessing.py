@@ -7,7 +7,7 @@ csv.field_size_limit(sys.maxsize)
 
 dataset = [];
 
-readcsvfile = open('csv/test2.csv')
+readcsvfile = open('csv/test.csv')
 writecsv = open('csv/network.csv','w')
 
 readCSV = csv.reader(readcsvfile, delimiter=',')
@@ -25,7 +25,7 @@ for row in readCSV:
     dt = dt.strftime('%Y-%m-%d %H:%M:%S')
     updated_row = row
     updated_row[0] = dt
-    final_output = updated_row[0:9];
+    final_output = updated_row[0:9]
     writeCSV.writerow(final_output)
 
 def filter(astr):
