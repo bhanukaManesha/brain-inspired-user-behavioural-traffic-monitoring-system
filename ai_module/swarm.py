@@ -37,8 +37,5 @@ def swarm(inputFile):
     writeModelParams(modelParams)
 
 
-
-
-
 if __name__ == "__main__":
     swarm("updated_test.csv")
