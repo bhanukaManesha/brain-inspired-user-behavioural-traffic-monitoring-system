@@ -15,6 +15,7 @@ writeCSV = csv.writer(writecsv)
 
 header = readCSV.next()
 writeCSV.writerow(header[0:9])
+<<<<<<< Updated upstream:ai_module/preprocessing.py
 writeCSV.writerow(["datetime","float","float","float","float","float","float","float","float"])
 writeCSV.writerow(["T","","","","","","","",""])
 
@@ -26,6 +27,15 @@ for row in readCSV:
     dt = datetime.datetime.fromtimestamp(row[0])
     dt = dt.strftime('%Y-%m-%d %H:%M:%S')
 
+=======
+writeCSV.writerow(["datetime","int","int","int","int","int","int","int","int"])
+writeCSV.writerow(["T","","","","","","","",""])
+
+
+for row in readCSV:
+    timestamp = float(row[0])
+    dt = datetime.datetime.fromtimestamp(timestamp)
+>>>>>>> Stashed changes:preprocessing.py
     updated_row = row
     updated_row[0] = dt
     final_output = updated_row[0:9]
