@@ -7,7 +7,7 @@ csv.field_size_limit(sys.maxsize)
 
 dataset = [];
 
-readcsvfile = open('csv/test.csv')
+readcsvfile = open('csv/test_large.csv')
 writecsv = open('csv/network.csv','w')
 
 readCSV = csv.reader(readcsvfile, delimiter=',')
@@ -15,7 +15,6 @@ writeCSV = csv.writer(writecsv)
 
 header = readCSV.next()
 writeCSV.writerow(header[0:9])
-<<<<<<< Updated upstream:ai_module/preprocessing.py
 writeCSV.writerow(["datetime","float","float","float","float","float","float","float","float"])
 writeCSV.writerow(["T","","","","","","","",""])
 

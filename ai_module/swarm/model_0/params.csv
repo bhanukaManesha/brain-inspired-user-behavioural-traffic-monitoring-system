@@ -1,0 +1,2 @@
+modelParams|clParams|alpha,modelParams|sensorParams|encoders|_classifierInput|n,modelParams|sensorParams|encoders|timestamp_timeOfDay:radius,modelParams|spParams|synPermInactiveDec,modelParams|tmParams|activationThreshold,modelParams|tmParams|minThreshold,modelParams|tmParams|pamLength
+0.07502500000000001,398,3.375,0.025225000000000004,15,11,4
