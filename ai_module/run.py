@@ -86,7 +86,7 @@ def runIoThroughNupic(inputData, model, gymName, plot):
     counter += 1
 
     timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
-    total = int(row[1])
+    total = float(row[1])
     
     result = model.run({
       "timestamp": timestamp,
@@ -105,7 +105,7 @@ def runIoThroughNupic(inputData, model, gymName, plot):
 
     # result = shifter.shift(result)
 
-    prediction = result.inferences["multiStepBestPredictions"][5]
+    prediction = result.inferences["multiStepBestPredictions"][1]
     output.write([timestamp], [total], [prediction])
 
     if plot and counter % 2 == 0:

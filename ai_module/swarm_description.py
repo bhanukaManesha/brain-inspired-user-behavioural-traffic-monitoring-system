@@ -6,9 +6,9 @@ SWARM_DESCRIPTION = {
 },
 {
     "fieldName" : "total",
-    "fieldType" : "int",
-    "maxValue"  : 143909,
-    "minValue"  : 187
+    "fieldType" : "float",
+    "maxValue"  : 143909.0,
+    "minValue"  : 187.0
 }
 ],
 "streamDef":
@@ -28,7 +28,7 @@ SWARM_DESCRIPTION = {
 "inferenceType": "TemporalMultiStep",
 "inferenceArgs": {
     "predictionSteps":[
-        5
+        1
     ],
     "predictedField" : "total"
 },
