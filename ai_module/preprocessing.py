@@ -7,7 +7,7 @@ csv.field_size_limit(sys.maxsize)
 
 dataset = [];
 
-readcsvfile = open('csv/test2.csv')
+readcsvfile = open('csv/test.csv')
 writecsv = open('csv/network.csv','w')
 
 readCSV = csv.reader(readcsvfile, delimiter=',')
