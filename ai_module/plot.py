@@ -16,36 +16,13 @@ next(csvReader)
 
 output = nupic_output.NuPICPlotOutput([GYM_NAME])
 
-# metricsManager = MetricsManager(_METRIC_SPECS, model.getFieldInfo(),
-#                                 model.getInferenceType())
-
 counter = 0
 for row in csvReader:
   counter += 1
 
   timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
-  total = float(row[1])
-  prediction = float(row[2])
-  # total_tcp = int(row[2])
-  # total_http = int(row[3])
-  # total_udp = int(row[4])
-  # size = int(row[5])
-  # size_tcp = int(row[6])
-  # size_http = int(row[7])
-  # size_udp = int(row[8])
-  #
-  # result = model.run({
-  #   "timestamp": timestamp,
-  #   "total": total,
-  #   "total_tcp" : total_tcp,
-  #   "total_http" : total_http,
-  #   "total_udp" : total_udp,
-  #   "size" : size,
-  #   "size_tcp" : size_tcp,
-  #   "size_http" : size_http,
-  #   "size_udp" : size_udp
-  # })
-
+  total = row[1]
+  prediction = row[2]
   output.write([timestamp], [total], [prediction])
   output.refreshGUI()
 

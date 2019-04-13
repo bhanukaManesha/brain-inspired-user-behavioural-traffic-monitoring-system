@@ -97,15 +97,8 @@ def runIoThroughNupic(inputData, model, gymName, plot):
 
     result = model.run({
       "timestamp": timestamp,
-      "total": total,
-      "total_tcp" : total_tcp,
-      "total_http" : total_http,
-      "total_udp" : total_udp,
-      "size" : size,
-      "size_tcp" : size_tcp,
-      "size_http" : size_http,
-      "size_udp" : size_udp
-    })
+      "total": total
+      })
 
     result.metrics = metricsManager.update(result)
 
@@ -119,7 +112,7 @@ def runIoThroughNupic(inputData, model, gymName, plot):
 
     # result = shifter.shift(result)
 
-    prediction = result.inferences["multiStepBestPredictions"][1]
+    prediction = result.inferences["multiStepBestPredictions"][5]
     output.write([timestamp], [total], [prediction])
 
     if plot and counter % 2 == 0:
