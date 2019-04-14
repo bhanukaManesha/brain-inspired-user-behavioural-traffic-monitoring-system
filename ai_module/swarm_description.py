@@ -5,10 +5,10 @@ SWARM_DESCRIPTION = {
     "fieldType" : "datetime"
 },
 {
-    "fieldName" : "total_tcp",
+    "fieldName" : "size_udp",
     "fieldType" : "float",
-    "maxValue"  : 143352,
-    "minValue"  : 0
+    "maxValue"  : 68596,
+    "minValue"  : 1024
 }
 ],
 "streamDef":
@@ -30,7 +30,7 @@ SWARM_DESCRIPTION = {
     "predictionSteps":[
         1
     ],
-    "predictedField" : "total_tcp"
+    "predictedField" : "size_udp"
 },
 "iterationCount":-1,
 "swarmSize":"medium"

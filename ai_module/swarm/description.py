@@ -105,12 +105,12 @@ config = {
     'name': u'timestamp_weekend',
     'type': 'DateEncoder',
     'weekend': 21},
-  u'total_tcp':     {   'clipInput': True,
-    'fieldname': u'total_tcp',
-    'maxval': 143352,
-    'minval': 0,
+  u'size_udp':     {   'clipInput': True,
+    'fieldname': u'size_udp',
+    'maxval': 68596,
+    'minval': 1024,
     'n': 100,
-    'name': u'total_tcp',
+    'name': u'size_udp',
     'type': 'ScalarEncoder',
     'w': 21},
             },
@@ -327,14 +327,14 @@ control = {
 
   # A dictionary containing all the supplementary parameters for inference
   "inferenceArgs":{u'inputPredictedField': 'auto',
- u'predictedField': u'total_tcp',
+ u'predictedField': u'size_udp',
  u'predictionSteps': [1]},
 
   # Metrics: A list of MetricSpecs that instantiate the metrics that are
   # computed for this experiment
   'metrics':[
-    MetricSpec(field=u'total_tcp', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'aae'}),
-    MetricSpec(field=u'total_tcp', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'altMAPE'})
+    MetricSpec(field=u'size_udp', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'aae'}),
+    MetricSpec(field=u'size_udp', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'altMAPE'})
   ],
 
   # Logged Metrics: A sequence of regular expressions that specify which of
