@@ -6,7 +6,7 @@ SWARM_DESCRIPTION = {
 },
 {
     "fieldName" : "total_tcp",
-    "fieldType" : "int",
+    "fieldType" : "float",
     "maxValue"  : 143352,
     "minValue"  : 0
 }
