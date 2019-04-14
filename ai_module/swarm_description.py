@@ -5,10 +5,10 @@ SWARM_DESCRIPTION = {
     "fieldType" : "datetime"
 },
 {
-    "fieldName" : "total",
-    "fieldType" : "float",
-    "maxValue"  : 143909.0,
-    "minValue"  : 187.0
+    "fieldName" : "total_tcp",
+    "fieldType" : "int",
+    "maxValue"  : 143352,
+    "minValue"  : 0
 }
 ],
 "streamDef":
@@ -25,12 +25,12 @@ SWARM_DESCRIPTION = {
         }
     ]
 },
-"inferenceType": "TemporalMultiStep",
+"inferenceType": "TemporalAnomaly",
 "inferenceArgs": {
     "predictionSteps":[
         1
     ],
-    "predictedField" : "total"
+    "predictedField" : "total_tcp"
 },
 "iterationCount":-1,
 "swarmSize":"medium"
