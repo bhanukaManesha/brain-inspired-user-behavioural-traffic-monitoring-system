@@ -11,22 +11,11 @@ from nupic.frameworks.opf.prediction_metrics_manager import MetricsManager
 
 import nupic_output
 
-# from MODEL_PARAMS import size_model_params as mps
-# from MODEL_PARAMS import size_http_model_params as mpsh
-# from MODEL_PARAMS import size_tcp_model_params as mpst
-# from MODEL_PARAMS import size_udp_model_params as mpsu
-# from MODEL_PARAMS import total_model_params as mpt
-# from MODEL_PARAMS import total_http_model_params as mpth
-# from MODEL_PARAMS import total_tcp_model_params as mptt
-# from MODEL_PARAMS import total_udp_model_params as mptu
-
-DESCRIPTION = ('Anomaly Detection')
+DESCRIPTION = ('Anomaly Detection for Network Activity')
 SYSTEM_NAME = "network_anomaly"
 DATA_DIR = "."
 INPUT_FILE = "network.csv"
-
-#timestamp,total,total_tcp,total_http,total_udp,size,size_tcp,size_http,size_udp
-
+DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 MODEL_NAMES = [
   "total",
   "total_tcp",
@@ -38,11 +27,6 @@ MODEL_NAMES = [
   "size_udp"
 ]
 
-# MODEL_DESC = [mps, mptt, mpth, mptu, mps, mpst, mpsh, mpsu]
-
-#  MODEL_PARAMS_DIR = "./model_params"
-
-DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 _METRIC_SPECS = (
     MetricSpec(field='total', metric='multiStep',
@@ -80,47 +64,39 @@ def getModelParamsFromName(modelName):
 
 def runIoThroughNupic(inputData, MODELS, systemName):
   ANOMALY_LIKELIHOOD = [0.0 for i in range(len(MODEL_NAMES))]
-
-
   inputFile = open(inputData, "rb")
   csvReader = csv.reader(inputFile)
+
   # skip header rows
   csvReader.next()
   csvReader.next()
   csvReader.next()
 
   shifter = InferenceShifter()
-
   output = nupic_output.NuPICFileOutput(systemName)
-
-  
-
   counter = 0
-  for row in csvReader:
-	counter += 1
-    	timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
+  metricsManager = [0 for i in range(len(MODELS))]
 
-    	for model_index in range(len(MODELS)):
-      		metricsManager = MetricsManager(_METRIC_SPECS, MODELS[model_index].getFieldInfo(),
+  for row in csvReader:
+    counter += 1
+    timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
+    for model_index in range(len(MODELS)):
+          metricsManager[model_index] = MetricsManager(_METRIC_SPECS, MODELS[model_index].getFieldInfo(),
                                   MODELS[model_index].getInferenceType())
 
-      		data = float(row[model_index+1])
-    
-      		data_type = MODEL_NAMES[model_index]
+          data = float(row[model_index+1])
+      		inference_type = MODEL_NAMES[model_index]
 
 	      	result = MODELS[model_index].run({
           		"timestamp": timestamp,
-          		data_type : data
+          		inference_type : data
       			})
 
-      		#result.metrics = metricsManager.update(result)
+      		result.metrics = metricsManager[model_index].update(result)
 
       		if counter % 20 == 0:
-      			print "Read %i lines..." % counter
-		      	#print ("After %i records, 1-step altMAPE=%f" % (counter,
-             			 #result.metrics["multiStepBestPredictions:multiStep:"
-                            	 #"errorMetric='altMAPE':steps=1:window=1000:"
-                             	#"field=total"]))
+		      	print ("%s: After %i records, 1-step altMAPE=%f" % (inference_type,counter, 
+                  result.metrics["multiStepBestPredictions:multiStep:""errorMetric='altMAPE':steps=1:window=1000:""field=total"]))
 
 	      	result = shifter.shift(result)
       
@@ -128,27 +104,37 @@ def runIoThroughNupic(inputData, MODELS, systemName):
       		anomalyScore = result.inferences["anomalyScore"]
       		anomalyLikelihood = output.get_anomaly_likelihood(timestamp, data, prediction ,anomalyScore)
 			
-      
       		ANOMALY_LIKELIHOOD[model_index] = anomalyLikelihood
   
       	output.write(timestamp,ANOMALY_LIKELIHOOD)
 
-
   inputFile.close()
   output.close()
 
+def loadModels(model_names):
+  m = [o for i in range(len(model_names))]
+  for index in range(model_names):
+    path = os.path.join(os.getcwd(), model_names(name))
+    m[index] = ModelFactory.loadFromCheckpoint(path)
+  return m
 
-def runModel(systemName):
+def saveModels(models,model_names):
+  for i in range(len(models)):
+    path = os.path.join(os.getcwd(), model_names(name))
+    models[i].save(path)
+
+
+def runModel(systemName,intialize = False):
   print "Creating models for %s..." % systemName
-  MODELS = initalizeModels()
+  if intialize :
+    MODELS = initalizeModels()
+  else:
+    MODELS = loadModels(MODEL_NAMES)  
   inputData = "%s/csv/%s" % (DATA_DIR, INPUT_FILE)
   runIoThroughNupic(inputData, MODELS, systemName)
-
-  # model.save()
-
+  saveModels(MODELS,MODEL_NAMES)
 
 
 if __name__ == "__main__":
   print DESCRIPTION
-  args = sys.argv[1:]
   runModel(SYSTEM_NAME)
