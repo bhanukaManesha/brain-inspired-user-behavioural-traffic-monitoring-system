@@ -28,22 +28,6 @@ MODEL_NAMES = [
   "size_udp"
 ]
 
-
-#_METRIC_SPECS = (
-#    MetricSpec(field='total', metric='multiStep',
-#               inferenceElement='multiStepBestPredictions',
-#               params={'errorMetric': 'aae', 'window': 1000, 'steps': 1}),
-#    MetricSpec(field='total', metric='trivial',
-#               inferenceElement='prediction',
-#               params={'errorMetric': 'aae', 'window': 1000, 'steps': 1}),
-#    MetricSpec(field='total', metric='multiStep',
-#               inferenceElement='multiStepBestPredictions',
-#               params={'errorMetric': 'altMAPE', 'window': 1000, 'steps': 1}),
-#    MetricSpec(field='total', metric='trivial',
-#               inferenceElement='prediction',
-#               params={'errorMetric': 'altMAPE', 'window': 1000, 'steps': 1}),
-#)
-
 def initalizeModels():
   MODELS = []
 
@@ -82,10 +66,7 @@ def runIoThroughNupic(inputData, MODELS, systemName):
     counter += 1
     timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
     for model_index in range(len(MODELS)):
-          	#metricsManager[model_index] = MetricsManager(_METRIC_SPECS, MODELS[model_index].getFieldInfo(),
-                #                  MODELS[model_index].getInferenceType())
-
-          	data = float(row[model_index+1])
+          data = float(row[model_index+1])
       		inference_type = MODEL_NAMES[model_index]
 
 	      	result = MODELS[model_index].run({
@@ -93,12 +74,8 @@ def runIoThroughNupic(inputData, MODELS, systemName):
           		inference_type : data
       			})
 
-      		#result.metrics = metricsManager[model_index].update(result)
-
       		if counter % 20 == 0:
-			print(str(counter) + ":" + inference_type)
-		      	#print ("%s: After %i records, 1-step altMAPE=%f" % (inference_type,counter, 
-                  #result.metrics["multiStepBestPredictions:multiStep:""errorMetric='altMAPE':steps=1:window=1000:""field=total"]))
+			      print(str(counter) + ":" + inference_type)
 
 	      	result = shifter.shift(result)
       
