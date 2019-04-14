@@ -75,7 +75,7 @@ class NuPICFileOutput(NuPICOutput):
   def get_anomaly_likelihood(self,timestamp, value, predicted, anomalyScore):
     if timestamp is not None:
       	anomalyLikelihood = self.anomalyLikelihoodHelper.anomalyProbability(value, anomalyScore, timestamp)
-	  return anomalyLikelihood
+        return anomalyLikelihood
 
 
   def write(self, timestamp, anomaly_likelihood):

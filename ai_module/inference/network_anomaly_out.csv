@@ -1,4 +1,4 @@
-timestamp,total,total_tcp,total_http,total_udp,size,size_tcpsize_http,size_udp
+timestamp,total,total_tcp,total_http,total_udp,size,size_tcp,size_http,size_udp
 2012-03-16 12:30:00,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
 2012-03-16 12:30:10,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
 2012-03-16 12:30:20,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
