@@ -17,6 +17,22 @@ try:
 except ImportError:
   pass
 
+
+
+
+MODEL_NAMES = [
+	"total",
+	"total_tcp",
+	"total_http",
+	"total_udp",
+	"size",
+	"size_tcp"
+	"size_http",
+	"size_udp"
+]
+
+
+
 # WINDOW = 300
 # HIGHLIGHT_ALPHA = 0.3
 # ANOMALY_HIGHLIGHT_COLOR = 'red'
@@ -52,9 +68,10 @@ class NuPICFileOutput(NuPICOutput):
     self.outputFiles = []
     self.outputWriters = []
     self.lineCount = 0
+        
 
     headerRow = ['timestamp']
-    for item in self.MODEL_NAMES:
+    for item in MODEL_NAMES:
         headerRow.append(item)
 
     outputFileName = "%s_out.csv" % self.name
@@ -66,10 +83,8 @@ class NuPICFileOutput(NuPICOutput):
 
   def get_anomaly_likelihood(self,timestamp, value, predicted, anomalyScore):
     if timestamp is not None:
-      anomalyLikelihood = self.anomalyLikelihoodHelper.anomalyProbability(
-        value, anomalyScore, timestamp
-    )
-    return anomaly_likelihood
+      	anomalyLikelihood = self.anomalyLikelihoodHelper.anomalyProbability(value, anomalyScore, timestamp)
+	return anomalyLikelihood
 
 
   def write(self, timestamp, anomaly_likelihood):
