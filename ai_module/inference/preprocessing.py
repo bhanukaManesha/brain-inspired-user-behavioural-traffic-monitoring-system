@@ -40,13 +40,10 @@ def csv2json():
         jsonfile.write('\n')
 
 
-def removeTimeStamp():
+def removeTimeStamp(input_filename,output_filename):
     csv.field_size_limit(sys.maxsize)
-
-    dataset = [];
-
-    readcsvfile = open('csv/test_large.csv')
-    writecsv = open('csv/network.csv','w')
+    readcsvfile = open('csv/' + input_filename + '.csv')
+    writecsv = open('csv/' + output_filename + '.csv','w')
 
     readCSV = csv.reader(readcsvfile, delimiter=',')
     writeCSV = csv.writer(writecsv)
