@@ -66,7 +66,7 @@ def runIoThroughNupic(inputData, MODELS, systemName):
     counter += 1
     timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
     for model_index in range(len(MODELS)):
-          data = float(row[model_index+1])
+		data = float(row[model_index+1])
       		inference_type = MODEL_NAMES[model_index]
 
 	      	result = MODELS[model_index].run({
@@ -90,31 +90,31 @@ def runIoThroughNupic(inputData, MODELS, systemName):
   inputFile.close()
   output.close()
 
-def loadModels(model_names):
-  m = [0 for i in range(len(model_names))]
+def loadModels(models,model_names):
+  #m = [0 for i in range(len(model_names))]
   for index in range(len(model_names)):
-    print("Loading " + model_names(index) + " ...")
-    path = os.path.join(os.getcwd(), "saved_models/" + model_names[index])
-    m[index] = ModelFactory.loadFromCheckpoint(path)
-    m[index].enableLearning()
+    print("Loading " + model_names[index] + " ...")
+    path = os.path.join(os.getcwd(), "saved models/" + model_names[index] + "/")
+    models[index].readFromCheckpoint(path)
+    #m[index] = ModelFactory.loadFromCheckpoint(path)
+    models[index].enableLearning()
     print(model_names[index] + "model successfully loaded")
-  return m
+  return models
 
 def saveModels(models,model_names):
   for i in range(len(models)):
     print("Saving " + model_names[i] + " ...")
-    path = os.path.join(os.getcwd(), "saved models/" + model_names[i])
+    path = os.path.join(os.getcwd(), "saved models/" + model_names[i]+ "/")
     models[i].disableLearning()
-    models[i].save(path)
-    print(model_name[i] + " model saved")
+    models[i].writeToCheckpoint(path)
+    print(model_names[i] + " model saved")
 
 
-def runModel(systemName,intialize = True):
+def runModel(systemName,load=True):
   print "Creating models for %s..." % systemName
-  if intialize :
-    MODELS = initalizeModels()
-  else:
-    MODELS = loadModels(MODEL_NAMES)  
+  MODELS = initalizeModels()
+  if load:
+      MODELS = loadModels(MODELS,MODEL_NAMES)
   inputData = "%s/csv/%s" % (DATA_DIR, INPUT_FILE)
   runIoThroughNupic(inputData, MODELS, systemName)
   saveModels(MODELS,MODEL_NAMES)
