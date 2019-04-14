@@ -78,7 +78,7 @@ config = {
     # Model parameter dictionary.
     'modelParams': {
         # The type of inference that this model will perform
-        'inferenceType': 'TemporalMultiStep',
+        'inferenceType': 'TemporalAnomaly',
 
         'sensorParams': {
             # Sensor diagnostic output verbosity control;
@@ -105,21 +105,12 @@ config = {
     'name': u'timestamp_weekend',
     'type': 'DateEncoder',
     'weekend': 21},
-  u'total':     {   'clipInput': True,
-    'fieldname': u'total',
-    'maxval': 143909.0,
-    'minval': 187.0,
+  u'total_tcp':     {   'clipInput': True,
+    'fieldname': u'total_tcp',
+    'maxval': 143352,
+    'minval': 0,
     'n': 100,
-    'name': u'total',
-    'type': 'ScalarEncoder',
-    'w': 21},
-  '_classifierInput':     {   'classifierOnly': True,
-    'clipInput': True,
-    'fieldname': u'total',
-    'maxval': 143909.0,
-    'minval': 187.0,
-    'n': 100,
-    'name': '_classifierInput',
+    'name': u'total_tcp',
     'type': 'ScalarEncoder',
     'w': 21},
             },
@@ -336,14 +327,14 @@ control = {
 
   # A dictionary containing all the supplementary parameters for inference
   "inferenceArgs":{u'inputPredictedField': 'auto',
- u'predictedField': u'total',
+ u'predictedField': u'total_tcp',
  u'predictionSteps': [1]},
 
   # Metrics: A list of MetricSpecs that instantiate the metrics that are
   # computed for this experiment
   'metrics':[
-    MetricSpec(field=u'total', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'aae'}),
-    MetricSpec(field=u'total', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'altMAPE'})
+    MetricSpec(field=u'total_tcp', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'aae'}),
+    MetricSpec(field=u'total_tcp', metric='multiStep', inferenceElement='multiStepBestPredictions', params={'window': 1000, 'steps': [1], 'errorMetric': 'altMAPE'})
   ],
 
   # Logged Metrics: A sequence of regular expressions that specify which of

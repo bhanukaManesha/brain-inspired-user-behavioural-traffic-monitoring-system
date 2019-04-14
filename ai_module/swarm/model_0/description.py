@@ -35,7 +35,7 @@ from nupic.frameworks.opf.exp_description_helpers import importBaseDescription
 # the sub-experiment configuration
 config ={
   'aggregationInfo' : {'seconds': 0, 'fields': [], 'months': 0, 'days': 0, 'years': 0, 'hours': 0, 'microseconds': 0, 'weeks': 0, 'minutes': 0, 'milliseconds': 0},
-  'modelParams' : {'tmParams': {'minThreshold': 11, 'activationThreshold': 15, 'pamLength': 4}, 'sensorParams': {'encoders': {u'timestamp_dayOfWeek': None, '_classifierInput': {'maxval': 143909.0, 'classifierOnly': True, 'minval': 187.0, 'clipInput': True, 'n': 398, 'fieldname': 'total', 'w': 21, 'type': 'ScalarEncoder'}, u'total': None, u'timestamp_timeOfDay': {'name': 'timestamp', 'fieldname': 'timestamp', 'timeOfDay': (21, 3.375), 'type': 'DateEncoder'}, u'timestamp_weekend': None}}, 'spParams': {'synPermInactiveDec': 0.025225000000000004}, 'clParams': {'alpha': 0.07502500000000001}},
+  'modelParams' : {'tmParams': {'minThreshold': 9, 'activationThreshold': 12, 'pamLength': 1}, 'sensorParams': {'encoders': {u'timestamp_dayOfWeek': None, u'timestamp_weekend': {'name': 'timestamp', 'type': 'DateEncoder', 'fieldname': 'timestamp', 'weekend': (21, 1)}, u'timestamp_timeOfDay': None, u'total_tcp': {'maxval': 143352, 'name': 'total_tcp', 'clipInput': True, 'minval': 0, 'n': 152, 'fieldname': 'total_tcp', 'w': 21, 'type': 'ScalarEncoder'}}}, 'spParams': {'synPermInactiveDec': 0.09337888362795525}, 'clParams': {'alpha': 0.0057785536068360194}},
 
 }
 

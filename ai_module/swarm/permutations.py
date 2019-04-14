@@ -34,7 +34,7 @@ from nupic.swarming.permutation_helpers import *
 # The name of the field being predicted.  Any allowed permutation MUST contain
 # the prediction field.
 # (generated from PREDICTION_FIELD)
-predictedField = 'total'
+predictedField = 'total_tcp'
 
 
 
@@ -59,8 +59,7 @@ permutations = {
           u'timestamp_timeOfDay': PermuteEncoder(fieldName='timestamp', encoderClass='DateEncoder.timeOfDay', radius=PermuteFloat(0.5, 12), w=21, ),
   u'timestamp_dayOfWeek': PermuteEncoder(encoderClass='DateEncoder.dayOfWeek', radius=PermuteFloat(1, 6), w=21, fieldName='timestamp', ),
   u'timestamp_weekend': PermuteEncoder(encoderClass='DateEncoder.weekend', radius=PermuteChoices([1]),  w=21, fieldName='timestamp', ),
-  u'total': PermuteEncoder(maxval=143909.0, fieldName='total', w=21, clipInput=True, minval=187.0, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
-  '_classifierInput': dict(maxval=143909.0, classifierOnly=True, clipInput=True, minval=187.0, n=PermuteInt(28, 521), fieldname='total', w=21, type='ScalarEncoder', ),
+  u'total_tcp': PermuteEncoder(maxval=143352, fieldName='total_tcp', w=21, clipInput=True, minval=0, encoderClass='ScalarEncoder', n=PermuteInt(22, 521), ),
       },
     },
 
@@ -89,15 +88,15 @@ permutations = {
 #       report generator
 # (fieldname values generated from PERM_PREDICTED_FIELD_NAME)
 report = [
-          '.*total.*',
+          '.*total_tcp.*',
          ]
 
 # Permutation optimization setting: either minimize or maximize metric
 # used by RunPermutations.
 # NOTE: The value is used as a regular expressions by RunPermutations.py's
 #       report generator
-# (generated from minimize = "multiStepBestPredictions:multiStep:errorMetric='altMAPE':steps=\[1\]:window=1000:field=total")
-minimize = "multiStepBestPredictions:multiStep:errorMetric='altMAPE':steps=\[1\]:window=1000:field=total"
+# (generated from minimize = "multiStepBestPredictions:multiStep:errorMetric='altMAPE':steps=\[1\]:window=1000:field=total_tcp")
+minimize = "multiStepBestPredictions:multiStep:errorMetric='altMAPE':steps=\[1\]:window=1000:field=total_tcp"
 
 minParticlesPerSwarm = 5
 
