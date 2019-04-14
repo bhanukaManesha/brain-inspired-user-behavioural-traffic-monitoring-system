@@ -17,12 +17,10 @@ try:
 except ImportError:
   pass
 
-WINDOW = 300
-HIGHLIGHT_ALPHA = 0.3
-ANOMALY_HIGHLIGHT_COLOR = 'red'
-# WEEKEND_HIGHLIGHT_COLOR = 'yellow'
-ANOMALY_THRESHOLD = 0.9
-
+# WINDOW = 300
+# HIGHLIGHT_ALPHA = 0.3
+# ANOMALY_HIGHLIGHT_COLOR = 'red'
+# ANOMALY_THRESHOLD = 0.9
 
 class NuPICOutput(object):
 
@@ -83,34 +81,6 @@ class NuPICFileOutput(NuPICOutput):
     print "Done. Wrote %i data lines to %s." % (self.lineCount, self.name)
 
 
-
-# def extractWeekendHighlights(dates):
-#   weekendsOut = []
-#   weekendSearch = [5, 6]
-#   weekendStart = None
-#   for i, date in enumerate(dates):
-#     if date.weekday() in weekendSearch:
-#       if weekendStart is None:
-#         # Mark start of weekend
-#         weekendStart = i
-#     else:
-#       if weekendStart is not None:
-#         # Mark end of weekend
-#         weekendsOut.append((
-#           weekendStart, i, WEEKEND_HIGHLIGHT_COLOR, HIGHLIGHT_ALPHA
-#         ))
-#         weekendStart = None
-
-#   # Cap it off if we're still in the middle of a weekend
-#   if weekendStart is not None:
-#     weekendsOut.append((
-#       weekendStart, len(dates)-1, WEEKEND_HIGHLIGHT_COLOR, HIGHLIGHT_ALPHA
-#     ))
-
-#   return weekendsOut
-
-
-
 def extractAnomalyIndices(anomalyLikelihood):
   anomaliesOut = []
   anomalyStart = None
@@ -135,9 +105,6 @@ def extractAnomalyIndices(anomalyLikelihood):
     ))
 
   return anomaliesOut
-
-
-
 class NuPICPlotOutput(NuPICOutput):
 
 

@@ -22,7 +22,7 @@ DESCRIPTION = (
   "NOTE: You must run ./swarm.py before this, because model parameters\n"
   "are required to run NuPIC.\n"
 )
-GYM_NAME = "network"  # or use "rec-center-every-15m-large"
+GYM_NAME = "network"
 DATA_DIR = "."
 MODEL_PARAMS_DIR = "./model_params"
 
@@ -122,6 +122,7 @@ def runModel(gymName, plot=False):
   model = createModel()
   inputData = "%s/csv/%s.csv" % (DATA_DIR, gymName.replace(" ", "_"))
   runIoThroughNupic(inputData, model, gymName, plot)
+  model.save()
 
 
 
