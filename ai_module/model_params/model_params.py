@@ -17,7 +17,7 @@ MODEL_PARAMS = \
                                  'regionName': 'SDRClassifierRegion',
                                  'steps': '1',
                                  'verbosity': 0},
-                   'inferenceType': 'TemporalMultiStep',
+                   'inferenceType': 'TemporalAnomaly',
                    'sensorParams': { 'encoders': { '_classifierInput': { 'classifierOnly': True,
                                                                          'clipInput': True,
                                                                          'fieldname': 'total',
