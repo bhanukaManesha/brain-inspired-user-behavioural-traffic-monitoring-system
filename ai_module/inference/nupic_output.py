@@ -26,7 +26,7 @@ MODEL_NAMES = [
 	"total_http",
 	"total_udp",
 	"size",
-	"size_tcp"
+	"size_tcp",
 	"size_http",
 	"size_udp"
 ]
