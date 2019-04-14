@@ -11,8 +11,14 @@ from nupic.frameworks.opf.prediction_metrics_manager import MetricsManager
 
 import nupic_output
 
-from model_params import model_params
-
+from MODEL_PARAMS.size import model_params as mps
+from MODEL_PARAMS.size_http import model_params as mpsh
+from MODEL_PARAMS.size_tcp import model_params as mpst
+from MODEL_PARAMS.size_udp import model_params as mpsu
+from MODEL_PARAMS.total import model_params as mpt
+from MODEL_PARAMS.total_http import model_params as mpth
+from MODEL_PARAMS.total_tcp import model_params as mptt
+from MODEL_PARAMS.total_udp import model_params as mptu
 
 DESCRIPTION = ('Anomaly Detection')
 SYSTEM_NAME = "network_anomaly"
@@ -31,6 +37,8 @@ MODEL_NAMES = [
   "size_http",
   "size_udp"
 ]
+
+MODEL_DESC = [mps, mptt, mpth, mptu, mps, mpst, mpsh, mpsu]
 
 #  MODEL_PARAMS_DIR = "./model_params"
 
@@ -54,27 +62,11 @@ _METRIC_SPECS = (
 def initalizeModels():
   MODELS = []
 
-  for name in MODEL_NAMES:
-    model = ModelFactory.create(model_params.MODEL_PARAMS)
-    model.enableInference({"predictedField": name})
+  for index in range(len(MODEL_NAMES)):
+    model = ModelFactory.create(MODEL_DESC[index])
+    model.enableInference({"predictedField": MODEL_NAMES[index]})
     MODELS.append(model)
-  
   return MODELS
-
-
-
-# def getModelParamsFromName(gymName):
-#   importName = "model_params.%s_model_params" % (
-#     gymName.replace(" ", "_").replace("-", "_")
-#   )
-#   print "Importing model params from %s" % importName
-#   try:
-#     importedModelParams = importlib.import_module(importName).MODEL_PARAMS
-#   except ImportError:
-#     raise Exception("No model params exist for '%s'. Run swarm first!"
-#                     % gymName)
-#   return importedModelParams
-
 
 
 def runIoThroughNupic(inputData, MODELS, systemName):
