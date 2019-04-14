@@ -4,7 +4,7 @@ import sys
 import csv
 import datetime
 
-from nupic.data.inference_shifter import InferenceShifter
+#from nupic.data.inference_shifter import InferenceShifter
 from nupic.frameworks.opf.metrics import MetricSpec
 from nupic.frameworks.opf.model_factory import ModelFactory
 from nupic.frameworks.opf.prediction_metrics_manager import MetricsManager
@@ -72,11 +72,11 @@ def runIoThroughNupic(inputData, model, gymName, plot):
   csvReader.next()
   csvReader.next()
 
-  shifter = InferenceShifter()
+  #shifter = InferenceShifter()
   if plot:
-    output = nupic_output.NuPICPlotOutput([gymName])
+    output = nupic_output.NuPICPlotOutput(gymName)
   else:
-    output = nupic_output.NuPICFileOutput([gymName])
+    output = nupic_output.NuPICFileOutput(gymName)
 
   metricsManager = MetricsManager(_METRIC_SPECS, model.getFieldInfo(),
                                   model.getInferenceType())
@@ -103,10 +103,11 @@ def runIoThroughNupic(inputData, model, gymName, plot):
                              "field=total"]))
 
 
-    result = shifter.shift(result)
+    #result = shifter.shift(result)
 
     prediction = result.inferences["multiStepBestPredictions"][1]
-    output.write([timestamp], [total], [prediction])
+    anomalyScore = result.inferences["anomalyScore"]
+    output.write(timestamp, total, prediction , anomalyScore)
 
     if plot and counter % 2 == 0:
         output.refreshGUI()
