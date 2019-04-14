@@ -105,8 +105,8 @@ def runIoThroughNupic(inputData, MODELS, systemName):
       result.metrics = metricsManager.update(result)
 
       if counter % 20 == 0:
-      print "Read %i lines..." % counter
-      print ("After %i records, 1-step altMAPE=%f" % (counter,
+      	print "Read %i lines..." % counter
+      	print ("After %i records, 1-step altMAPE=%f" % (counter,
               result.metrics["multiStepBestPredictions:multiStep:"
                              "errorMetric='altMAPE':steps=1:window=1000:"
                              "field=total"]))
