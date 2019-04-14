@@ -11,14 +11,14 @@ from nupic.frameworks.opf.prediction_metrics_manager import MetricsManager
 
 import nupic_output
 
-from MODEL_PARAMS import size_model_params as mps
-from MODEL_PARAMS import size_http_model_params as mpsh
-from MODEL_PARAMS import size_tcp_model_params as mpst
-from MODEL_PARAMS import size_udp_model_params as mpsu
-from MODEL_PARAMS import total_model_params as mpt
-from MODEL_PARAMS import total_http_model_params as mpth
-from MODEL_PARAMS import total_tcp_model_params as mptt
-from MODEL_PARAMS import total_udp_model_params as mptu
+# from MODEL_PARAMS import size_model_params as mps
+# from MODEL_PARAMS import size_http_model_params as mpsh
+# from MODEL_PARAMS import size_tcp_model_params as mpst
+# from MODEL_PARAMS import size_udp_model_params as mpsu
+# from MODEL_PARAMS import total_model_params as mpt
+# from MODEL_PARAMS import total_http_model_params as mpth
+# from MODEL_PARAMS import total_tcp_model_params as mptt
+# from MODEL_PARAMS import total_udp_model_params as mptu
 
 DESCRIPTION = ('Anomaly Detection')
 SYSTEM_NAME = "network_anomaly"
@@ -38,7 +38,7 @@ MODEL_NAMES = [
   "size_udp"
 ]
 
-MODEL_DESC = [mps, mptt, mpth, mptu, mps, mpst, mpsh, mpsu]
+# MODEL_DESC = [mps, mptt, mpth, mptu, mps, mpst, mpsh, mpsu]
 
 #  MODEL_PARAMS_DIR = "./model_params"
 
@@ -63,11 +63,20 @@ def initalizeModels():
   MODELS = []
 
   for index in range(len(MODEL_NAMES)):
-    model = ModelFactory.create(MODEL_DESC[index])
+    model = ModelFactory.create(getModelParamsFromName(MODEL_NAMES[index]))
     model.enableInference({"predictedField": MODEL_NAMES[index]})
     MODELS.append(model)
   return MODELS
 
+def getModelParamsFromName(modelName):
+    importName = "MODEL_PARAMS."+ modelName +"_model_params" 
+    print("Importing model params from " + modelName)
+    try:
+      importedModelParams = importlib.import_module(importName).MODEL_PARAMS
+    except ImportError:
+      raise Exception("No model params exist for '%s'. Run swarm first!"
+                      % modelName)
+    return importedModelParams
 
 def runIoThroughNupic(inputData, MODELS, systemName):
   ANOMALY_LIKELIHOOD = [0.0 for i in range(len(MODEL_NAMES))]
