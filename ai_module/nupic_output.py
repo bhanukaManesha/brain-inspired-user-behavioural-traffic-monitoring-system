@@ -1,42 +1,27 @@
-# ----------------------------------------------------------------------
-# Numenta Platform for Intelligent Computing (NuPIC)
-# Copyright (C) 2013, Numenta, Inc.  Unless you have an agreement
-# with Numenta, Inc., for a separate license for this software code, the
-# following terms and conditions apply:
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero Public License version 3 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the GNU Affero Public License for more details.
-#
-# You should have received a copy of the GNU Affero Public License
-# along with this program.  If not, see http://www.gnu.org/licenses.
-#
-# http://numenta.org/licenses/
-# ----------------------------------------------------------------------
 """
 Provides two classes with the same signature for writing data out of NuPIC
 models.
-(This is a component of the One Hot Gym Prediction Tutorial.)
+(This is a component of the One Hot Gym Anomaly Tutorial.)
 """
 import csv
 from collections import deque
 from abc import ABCMeta, abstractmethod
+from nupic.algorithms import anomaly_likelihood
 # Try to import matplotlib, but we don't have to.
 try:
   import matplotlib
   matplotlib.use('TKAgg')
   import matplotlib.pyplot as plt
   import matplotlib.gridspec as gridspec
-  from matplotlib.dates import date2num
+  from matplotlib.dates import date2num, DateFormatter
 except ImportError:
   pass
 
-WINDOW = 100
+WINDOW = 300
+HIGHLIGHT_ALPHA = 0.3
+ANOMALY_HIGHLIGHT_COLOR = 'red'
+# WEEKEND_HIGHLIGHT_COLOR = 'yellow'
+ANOMALY_THRESHOLD = 0.9
 
 
 class NuPICOutput(object):
@@ -44,20 +29,20 @@ class NuPICOutput(object):
   __metaclass__ = ABCMeta
 
 
-  def __init__(self, names, showAnomalyScore=False):
-    self.names = names
-    self.showAnomalyScore = showAnomalyScore
+  def __init__(self, name):
+    self.name = name
+    self.anomalyLikelihoodHelper = anomaly_likelihood.AnomalyLikelihood()
 
 
   @abstractmethod
-  def write(self, timestamps, actualValues, predictedValues,
-            predictionStep=1):
+  def write(self, timestamp, value, predicted, anomalyScore):
     pass
 
 
   @abstractmethod
   def close(self):
     pass
+
 
 
 
@@ -68,42 +53,88 @@ class NuPICFileOutput(NuPICOutput):
     super(NuPICFileOutput, self).__init__(*args, **kwargs)
     self.outputFiles = []
     self.outputWriters = []
-    self.lineCounts = []
-    headerRow = ['timestamp', 'ground_truth', 'prediction']
-    for name in self.names:
-      self.lineCounts.append(0)
-      outputFileName = "%s_out.csv" % name
-      # print "Preparing to output %s data to %s" % (name, outputFileName)
-      outputFile = open(outputFileName, "w")
-      self.outputFiles.append(outputFile)
-      outputWriter = csv.writer(outputFile)
-      self.outputWriters.append(outputWriter)
-      outputWriter.writerow(headerRow)
+    self.lineCount = 0
+    headerRow = [
+      'timestamp', 'ground_truth', 'prediction',
+      'anomaly_score', 'anomaly_likelihood'
+    ]
+    outputFileName = "%s_out.csv" % self.name
+    print "Preparing to output %s data to %s" % (self.name, outputFileName)
+    self.outputFile = open(outputFileName, "w")
+    self.outputWriter = csv.writer(self.outputFile)
+    self.outputWriter.writerow(headerRow)
 
 
 
-  def write(self, timestamps, actualValues, predictedValues,
-            predictionStep=1):
 
-    assert len(timestamps) == len(actualValues) == len(predictedValues)
-
-    for index in range(len(self.names)):
-      timestamp = timestamps[index]
-      actual = actualValues[index]
-      prediction = predictedValues[index]
-      writer = self.outputWriters[index]
-
-      if timestamp is not None:
-        outputRow = [timestamp, actual, prediction]
-        writer.writerow(outputRow)
-        self.lineCounts[index] += 1
+  def write(self, timestamp, value, predicted, anomalyScore):
+    if timestamp is not None:
+      anomalyLikelihood = self.anomalyLikelihoodHelper.anomalyProbability(
+        value, anomalyScore, timestamp
+      )
+      outputRow = [timestamp, value, predicted, anomalyScore, anomalyLikelihood]
+      self.outputWriter.writerow(outputRow)
+      self.lineCount += 1
 
 
 
   def close(self):
-    for index, name in enumerate(self.names):
-      self.outputFiles[index].close()
-      # print "Done. Wrote %i data lines to %s." % (self.lineCounts[index], name)
+    self.outputFile.close()
+    print "Done. Wrote %i data lines to %s." % (self.lineCount, self.name)
+
+
+
+# def extractWeekendHighlights(dates):
+#   weekendsOut = []
+#   weekendSearch = [5, 6]
+#   weekendStart = None
+#   for i, date in enumerate(dates):
+#     if date.weekday() in weekendSearch:
+#       if weekendStart is None:
+#         # Mark start of weekend
+#         weekendStart = i
+#     else:
+#       if weekendStart is not None:
+#         # Mark end of weekend
+#         weekendsOut.append((
+#           weekendStart, i, WEEKEND_HIGHLIGHT_COLOR, HIGHLIGHT_ALPHA
+#         ))
+#         weekendStart = None
+
+#   # Cap it off if we're still in the middle of a weekend
+#   if weekendStart is not None:
+#     weekendsOut.append((
+#       weekendStart, len(dates)-1, WEEKEND_HIGHLIGHT_COLOR, HIGHLIGHT_ALPHA
+#     ))
+
+#   return weekendsOut
+
+
+
+def extractAnomalyIndices(anomalyLikelihood):
+  anomaliesOut = []
+  anomalyStart = None
+  for i, likelihood in enumerate(anomalyLikelihood):
+    if likelihood >= ANOMALY_THRESHOLD:
+      if anomalyStart is None:
+        # Mark start of anomaly
+        anomalyStart = i
+    else:
+      if anomalyStart is not None:
+        # Mark end of anomaly
+        anomaliesOut.append((
+          anomalyStart, i, ANOMALY_HIGHLIGHT_COLOR, HIGHLIGHT_ALPHA
+        ))
+        anomalyStart = None
+
+  # Cap it off if we're still in the middle of an anomaly
+  if anomalyStart is not None:
+    anomaliesOut.append((
+      anomalyStart, len(anomalyLikelihood)-1,
+      ANOMALY_HIGHLIGHT_COLOR, HIGHLIGHT_ALPHA
+    ))
+
+  return anomaliesOut
 
 
 
@@ -116,81 +147,147 @@ class NuPICPlotOutput(NuPICOutput):
     plt.ion()
     self.dates = []
     self.convertedDates = []
-    self.actualValues = []
-    self.predictedValues = []
-    self.actualLines = []
-    self.predictedLines = []
+    self.value = []
+    self.allValues = []
+    self.predicted = []
+    self.anomalyScore = []
+    self.anomalyLikelihood = []
+    self.actualLine = None
+    self.predictedLine = None
+    self.anomalyScoreLine = None
+    self.anomalyLikelihoodLine = None
     self.linesInitialized = False
-    self.graphs = []
-    plotCount = len(self.names)
-    plotHeight = max(plotCount * 3, 6)
-    fig = plt.figure(figsize=(14, plotHeight))
-    gs = gridspec.GridSpec(plotCount, 1)
-    for index in range(len(self.names)):
-      self.graphs.append(fig.add_subplot(gs[index, 0]))
-      plt.title(self.names[index])
-      plt.ylabel('Prediction Label')
-      plt.xlabel('Date')
+    self._chartHighlights = []
+    fig = plt.figure(figsize=(16, 10))
+    gs = gridspec.GridSpec(2, 1, height_ratios=[3,  1])
+
+    self._mainGraph = fig.add_subplot(gs[0, 0])
+    plt.title(self.name)
+    plt.ylabel('KW Energy Consumption')
+    plt.xlabel('Date')
+
+    self._anomalyGraph = fig.add_subplot(gs[1])
+
+    plt.ylabel('Percentage')
+    plt.xlabel('Date')
+
+    # Maximizes window
+    mng = plt.get_current_fig_manager()
+    mng.resize(*mng.window.maxsize())
+
     plt.tight_layout()
 
 
 
-  def initializeLines(self, timestamps):
-    for index in range(len(self.names)):
-      # print "initializing %s" % self.names[index]
-      # graph = self.graphs[index]
-      self.dates.append(deque([timestamps[index]] * WINDOW, maxlen=WINDOW))
-      self.convertedDates.append(deque(
-        [date2num(date) for date in self.dates[index]], maxlen=WINDOW
-      ))
-      self.actualValues.append(deque([0.0] * WINDOW, maxlen=WINDOW))
-      self.predictedValues.append(deque([0.0] * WINDOW, maxlen=WINDOW))
+  def initializeLines(self, timestamp):
+    print "initializing %s" % self.name
+    anomalyRange = (0.0, 1.0)
+    self.dates = deque([timestamp] * WINDOW, maxlen=WINDOW)
+    self.convertedDates = deque(
+      [date2num(date) for date in self.dates], maxlen=WINDOW
+    )
+    self.value = deque([0.0] * WINDOW, maxlen=WINDOW)
+    self.predicted = deque([0.0] * WINDOW, maxlen=WINDOW)
+    self.anomalyScore = deque([0.0] * WINDOW, maxlen=WINDOW)
+    self.anomalyLikelihood = deque([0.0] * WINDOW, maxlen=WINDOW)
 
-      actualPlot, = self.graphs[index].plot(
-        self.dates[index], self.actualValues[index]
-      )
-      self.actualLines.append(actualPlot)
-      predictedPlot, = self.graphs[index].plot(
-        self.dates[index], self.predictedValues[index]
-      )
-      self.predictedLines.append(predictedPlot)
+    actualPlot, = self._mainGraph.plot(self.dates, self.value)
+    self.actualLine = actualPlot
+    predictedPlot, = self._mainGraph.plot(self.dates, self.predicted)
+    self.predictedLine = predictedPlot
+    self._mainGraph.legend(tuple(['actual', 'predicted']), loc=3)
+
+    anomalyScorePlot, = self._anomalyGraph.plot(
+      self.dates, self.anomalyScore, 'm'
+    )
+    anomalyScorePlot.axes.set_ylim(anomalyRange)
+
+    self.anomalyScoreLine = anomalyScorePlot
+    anomalyLikelihoodPlot, = self._anomalyGraph.plot(
+      self.dates, self.anomalyScore, 'r'
+    )
+    anomalyLikelihoodPlot.axes.set_ylim(anomalyRange)
+    self.anomalyLikelihoodLine = anomalyLikelihoodPlot
+    self._anomalyGraph.legend(
+      tuple(['anomaly score', 'anomaly likelihood']), loc=3
+    )
+
+    dateFormatter = DateFormatter('%m/%d %H:%M')
+    self._mainGraph.xaxis.set_major_formatter(dateFormatter)
+    self._anomalyGraph.xaxis.set_major_formatter(dateFormatter)
+
+    self._mainGraph.relim()
+    self._mainGraph.autoscale_view(True, True, True)
+
     self.linesInitialized = True
 
 
 
-  def write(self, timestamps, actualValues, predictedValues,
-            predictionStep=1):
+  def highlightChart(self, highlights, chart):
+    for highlight in highlights:
+      # Each highlight contains [start-index, stop-index, color, alpha]
+      self._chartHighlights.append(chart.axvspan(
+        self.convertedDates[highlight[0]], self.convertedDates[highlight[1]],
+        color=highlight[2], alpha=highlight[3]
+      ))
 
-    assert len(timestamps) == len(actualValues) == len(predictedValues)
+
+
+  def write(self, timestamp, value, predicted, anomalyScore):
 
     # We need the first timestamp to initialize the lines at the right X value,
     # so do that check first.
     if not self.linesInitialized:
-      self.initializeLines(timestamps)
+      self.initializeLines(timestamp)
 
-    for index in range(len(self.names)):
-      self.dates[index].append(timestamps[index])
-      self.convertedDates[index].append(date2num(timestamps[index]))
-      self.actualValues[index].append(actualValues[index])
-      self.predictedValues[index].append(predictedValues[index])
+    anomalyLikelihood = self.anomalyLikelihoodHelper.anomalyProbability(
+      value, anomalyScore, timestamp
+    )
 
-      # Update data
-      self.actualLines[index].set_xdata(self.convertedDates[index])
-      self.actualLines[index].set_ydata(self.actualValues[index])
-      self.predictedLines[index].set_xdata(self.convertedDates[index])
-      self.predictedLines[index].set_ydata(self.predictedValues[index])
+    self.dates.append(timestamp)
+    self.convertedDates.append(date2num(timestamp))
+    self.value.append(value)
+    self.allValues.append(value)
+    self.predicted.append(predicted)
+    self.anomalyScore.append(anomalyScore)
+    self.anomalyLikelihood.append(anomalyLikelihood)
 
-      self.graphs[index].relim()
-      self.graphs[index].autoscale_view(True, True, True)
+    # Update main chart data
+    self.actualLine.set_xdata(self.convertedDates)
+    self.actualLine.set_ydata(self.value)
+    self.predictedLine.set_xdata(self.convertedDates)
+    self.predictedLine.set_ydata(self.predicted)
+    # Update anomaly chart data
+    self.anomalyScoreLine.set_xdata(self.convertedDates)
+    self.anomalyScoreLine.set_ydata(self.anomalyScore)
+    self.anomalyLikelihoodLine.set_xdata(self.convertedDates)
+    self.anomalyLikelihoodLine.set_ydata(self.anomalyLikelihood)
+
+    # Remove previous highlighted regions
+    for poly in self._chartHighlights:
+      poly.remove()
+    self._chartHighlights = []
+
+    # weekends = extractWeekendHighlights(self.dates)
+    anomalies = extractAnomalyIndices(self.anomalyLikelihood)
+
+    # Highlight weekends in main chart
+    # self.highlightChart(weekends, self._mainGraph)
+
+    # Highlight anomalies in anomaly chart
+    self.highlightChart(anomalies, self._anomalyGraph)
+
+    maxValue = max(self.allValues)
+    self._mainGraph.relim()
+    self._mainGraph.axes.set_ylim(0, maxValue + (maxValue * 0.02))
+
+    self._mainGraph.relim()
+    self._mainGraph.autoscale_view(True, scaley=False)
+    self._anomalyGraph.relim()
+    self._anomalyGraph.autoscale_view(True, True, True)
 
     plt.draw()
-    plt.legend(('actual','predicted'), loc=3)
 
-
-  def refreshGUI(self):
-      """Give plot a pause, so data is drawn and GUI's event loop can run.
-      """
-      plt.pause(0.0001)
 
 
   def close(self):
@@ -199,5 +296,5 @@ class NuPICPlotOutput(NuPICOutput):
 
 
 
-# NuPICOutput.register(NuPICFileOutput)
-# NuPICOutput.register(NuPICPlotOutput)
+NuPICOutput.register(NuPICFileOutput)
+NuPICOutput.register(NuPICPlotOutput)
