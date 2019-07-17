@@ -120,6 +120,6 @@ def runModel(systemName,load=True):
   saveModels(MODELS,MODEL_NAMES)
 
 
-if __name__ == "__main__":
-  print DESCRIPTION
-  runModel(SYSTEM_NAME)
+# if __name__ == "__main__":
+#   print DESCRIPTION
+#   runModel(SYSTEM_NAME)

@@ -1,24 +1,19 @@
 import csv
 import datetime
 import sys
-import csv
-
-import csv
 import json
 
 
-def json2csv(json,file_name,new_file=False):
-    load_json = json.loads(json)
-
+def json2csv(json_data,file_name,new_file=False):
     if new_file:
-        f = csv.writer(open(file_name, "wb+"))
+        f = csv.writer(open(file_name, "w+"))
         f.writerow(["datetime","total","total_tcp","total_http","total_udp","size","size_tcp","size_http","size_udp"])
     else:
         f = csv.writer(open(file_name, "a"))
 
-    for line in load_json:
-        f.writerow(
-            line["datetime"],
+    for line in json_data:
+        f.writerow([
+            line["timestamp"],
             line["total"],
             line["total_tcp"],
             line["total_http"],
@@ -27,7 +22,7 @@ def json2csv(json,file_name,new_file=False):
             line["size_tcp"],
             line["size_http"],
             line["size_udp"]
-            )
+            ])
 
 def csv2json():
     csvfile = open('file.csv', 'r')
@@ -42,13 +37,13 @@ def csv2json():
 
 def removeTimeStamp(input_filename,output_filename):
     csv.field_size_limit(sys.maxsize)
-    readcsvfile = open('csv/' + input_filename + '.csv')
-    writecsv = open('csv/' + output_filename + '.csv','w')
+    readcsvfile = open(input_filename)
+    writecsv = open(output_filename,'w')
 
     readCSV = csv.reader(readcsvfile, delimiter=',')
     writeCSV = csv.writer(writecsv)
 
-    header = readCSV.next()
+    header = next(readCSV)
     writeCSV.writerow(header[0:9])
     writeCSV.writerow(["datetime","float","float","float","float","float","float","float","float"])
     writeCSV.writerow(["T","","","","","","","",""])
