@@ -15,7 +15,7 @@ import nupic_output
 DESCRIPTION = ('Anomaly Detection for Network Activity')
 SYSTEM_NAME = "network_anomaly"
 DATA_DIR = "."
-INPUT_FILE = "network.csv"
+INPUT_FILE = "data/filtered_data.csv"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 MODEL_NAMES = [
   "total",

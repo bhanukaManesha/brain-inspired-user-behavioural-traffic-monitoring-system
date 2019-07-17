@@ -1,6 +1,8 @@
 #!flask/bin/python
 import sys
+sys.path.insert(0, '/usr/local/src/nupic')
 sys.path.insert(0, '../ai_module/inference/')
+
 
 from flask import Flask, jsonify,request
 
