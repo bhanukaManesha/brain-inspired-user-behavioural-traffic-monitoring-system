@@ -25,14 +25,10 @@ def json2csv(json_data,file_name,new_file=False):
             ])
 
 def csv2json():
-    csvfile = open('file.csv', 'r')
-    jsonfile = open('file.json', 'w')
-
+    csvfile = open('data/output.csv', 'r')
     fieldnames = ("datetime","total","total_tcp","total_http","total_udp","size","size_tcp","size_http","size_udp")
     reader = csv.DictReader( csvfile, fieldnames)
-    for row in reader:
-        json.dump(row, jsonfile)
-        jsonfile.write('\n')
+    return list(reader)
 
 
 def removeTimeStamp(input_filename,output_filename):

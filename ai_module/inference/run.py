@@ -4,7 +4,9 @@ import sys
 import csv
 import datetime
 import os
+import cPickle as pickle
 
+from preprocessing import json2csv,removeTimeStamp,csv2json
 from nupic.data.inference_shifter import InferenceShifter
 from nupic.frameworks.opf.metrics import MetricSpec
 from nupic.frameworks.opf.model_factory import ModelFactory
@@ -15,7 +17,7 @@ import nupic_output
 DESCRIPTION = ('Anomaly Detection for Network Activity')
 SYSTEM_NAME = "network_anomaly"
 DATA_DIR = "."
-INPUT_FILE = "data/filtered_data.csv"
+INPUT_FILE = "filtered_data.csv"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 MODEL_NAMES = [
   "total",
@@ -28,15 +30,6 @@ MODEL_NAMES = [
   "size_udp"
 ]
 
-def initalizeModels():
-  MODELS = []
-
-  for index in range(len(MODEL_NAMES)):
-    model = ModelFactory.create(getModelParamsFromName(MODEL_NAMES[index]))
-    model.enableInference({"predictedField": MODEL_NAMES[index]})
-    MODELS.append(model)
-  return MODELS
-
 def getModelParamsFromName(modelName):
     importName = "MODELS_PARAMS."+ modelName +"_model_params" 
     print("Importing model params from " + modelName)
@@ -47,7 +40,11 @@ def getModelParamsFromName(modelName):
                       % importName)
     return importedModelParams
 
-def runIoThroughNupic(inputData, MODELS, systemName):
+def runDataThroughNupic(MODELS, anomaly_helper, inputData, systemName):
+
+  ANOMALY_OBJ = nupic_output.NuPICFileOutput(systemName)
+
+  ANOMALY_OBJ.anomalyLikelihoodHelper = anomaly_helper
   ANOMALY_LIKELIHOOD = [0.0 for i in range(len(MODEL_NAMES))]
   inputFile = open(inputData, "rb")
   csvReader = csv.reader(inputFile)
@@ -58,7 +55,7 @@ def runIoThroughNupic(inputData, MODELS, systemName):
   csvReader.next()
 
   shifter = InferenceShifter()
-  output = nupic_output.NuPICFileOutput(systemName)
+  
   counter = 0
   metricsManager = [0 for i in range(len(MODELS))]
 
@@ -81,45 +78,88 @@ def runIoThroughNupic(inputData, MODELS, systemName):
       
 	      	prediction = result.inferences["multiStepBestPredictions"][1]
       		anomalyScore = result.inferences["anomalyScore"]
-      		anomalyLikelihood = output.get_anomaly_likelihood(timestamp, data, prediction ,anomalyScore)
+      		anomalyLikelihood = ANOMALY_OBJ.get_anomaly_likelihood(timestamp, data, prediction ,anomalyScore)
 			
       		ANOMALY_LIKELIHOOD[model_index] = anomalyLikelihood
   
-    output.write(timestamp,ANOMALY_LIKELIHOOD)
+    ANOMALY_OBJ.write(timestamp,ANOMALY_LIKELIHOOD)
 
   inputFile.close()
-  output.close()
+  ANOMALY_OBJ.close()
+  print("Saving Anomaly Object")
+  with open('objects/anomaly_object.pkl', 'wb') as o:
+    pickle.dump(ANOMALY_OBJ.anomalyLikelihoodHelper, o)
 
 def loadModels(models,model_names):
-  #m = [0 for i in range(len(model_names))]
   for index in range(len(model_names)):
     print("Loading " + model_names[index] + " ...")
     path = os.path.join(os.getcwd(), "saved models/" + model_names[index] + "/")
+    # models[index].load(path)
     models[index].readFromCheckpoint(path)
-    #m[index] = ModelFactory.loadFromCheckpoint(path)
-    models[index].enableLearning()
     print(model_names[index] + "model successfully loaded")
-  return models
 
-def saveModels(models,model_names):
+  with open('objects/anomaly_object.pkl', 'rb') as f:
+    anomaly_obj = pickle.load(f)
+  return models,anomaly_obj
+
+def initalizeModels():
+  MODELS = []
+
+  for index in range(len(MODEL_NAMES)):
+    model = ModelFactory.create(getModelParamsFromName(MODEL_NAMES[index]))
+    model.enableInference({"predictedField": MODEL_NAMES[index]})
+    MODELS.append(model)
+  anomaly = nupic_output.NuPICFileOutput(SYSTEM_NAME)
+  ANOMALY_OBJ = anomaly.anomalyLikelihoodHelper
+
+  return MODELS,ANOMALY_OBJ
+
+def saveModels(models,model_names,anomaly_obj):
   for i in range(len(models)):
     print("Saving " + model_names[i] + " ...")
     path = os.path.join(os.getcwd(), "saved models/" + model_names[i]+ "/")
-    models[i].disableLearning()
     models[i].writeToCheckpoint(path)
+    # models[i].save(path)
     print(model_names[i] + " model saved")
 
 
-def runModel(systemName,load=True):
+def runModel(systemName):
   print "Creating models for %s..." % systemName
-  MODELS = initalizeModels()
-  if load:
-      MODELS = loadModels(MODELS,MODEL_NAMES)
-  inputData = "%s/csv/%s" % (DATA_DIR, INPUT_FILE)
-  runIoThroughNupic(inputData, MODELS, systemName)
-  saveModels(MODELS,MODEL_NAMES)
+  MODELS,ANOMALY_OBJ = initalizeModels()
+  path = os.path.join(os.getcwd(), "saved models/")
+  if os.path.isdir(path):
+      MODELS,ANOMALY_OBJ = loadModels(MODELS,MODEL_NAMES)
+  inputData = "%s/data/%s" % (DATA_DIR, INPUT_FILE)
+  runDataThroughNupic(MODELS,ANOMALY_OBJ, inputData, systemName)
+  saveModels(MODELS,MODEL_NAMES,ANOMALY_OBJ)
 
+#################################################
 
-# if __name__ == "__main__":
-#   print DESCRIPTION
-#   runModel(SYSTEM_NAME)
+def inference_data(json):
+    json2csv(json,"data/data.csv",True)
+    removeTimeStamp("data/data.csv","data/filtered_data.csv")
+
+    # Run the model
+    runModel(SYSTEM_NAME)
+    return csv2json()
+
+#################################################
+
+#!flask/bin/python
+
+from flask import Flask, jsonify,request
+from waitress import serve
+app = Flask(__name__)
+
+@app.route('/', methods=['GET'])
+def app_index():
+    return "Please use the POST request with extension : data"
+
+@app.route('/data', methods=['POST'])
+def receive_data():
+    content = request.get_json()
+    data = inference_data(content["data"])
+    return jsonify(data)
+
+def create_app():
+    serve(app, host="0.0.0.0",port=80)

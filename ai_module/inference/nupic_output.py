@@ -51,6 +51,7 @@ class NuPICOutput(object):
 
 
 
+
 class NuPICFileOutput(NuPICOutput):
 
 
@@ -60,16 +61,14 @@ class NuPICFileOutput(NuPICOutput):
     self.outputWriters = []
     self.lineCount = 0
         
-
-    headerRow = ['timestamp']
-    for item in MODEL_NAMES:
-        headerRow.append(item)
-
-    outputFileName = "%s_out.csv" % self.name
+    # headerRow = ['timestamp']
+    # for item in MODEL_NAMES:
+    #     headerRow.append(item)
+    outputFileName = "data/output.csv"
     print "Preparing to output %s data to %s" % (self.name, outputFileName)
     self.outputFile = open(outputFileName, "w")
     self.outputWriter = csv.writer(self.outputFile)
-    self.outputWriter.writerow(headerRow)
+    # self.outputWriter.writerow(headerRow)
 
 
   def get_anomaly_likelihood(self,timestamp, value, predicted, anomalyScore):
@@ -80,6 +79,7 @@ class NuPICFileOutput(NuPICOutput):
 
   def write(self, timestamp, anomaly_likelihood):
       outputRow = [timestamp]
+      self.lineCount = 0
       for item in anomaly_likelihood:
         outputRow.append(item)
 
