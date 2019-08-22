@@ -87,6 +87,11 @@ def runDataThroughNupic(MODELS, anomaly_helper, inputData, systemName):
   inputFile.close()
   ANOMALY_OBJ.close()
   print("Saving Anomaly Object")
+
+  path = os.path.join(os.getcwd(), "objects/")
+  if os.path.isdir(path) is False:
+    os.mkdir('objects')
+
   with open('objects/anomaly_object.pkl', 'wb') as o:
     pickle.dump(ANOMALY_OBJ.anomalyLikelihoodHelper, o)
 
@@ -100,6 +105,7 @@ def loadModels(models,model_names):
 
   with open('objects/anomaly_object.pkl', 'rb') as f:
     anomaly_obj = pickle.load(f)
+  
   return models,anomaly_obj
 
 def initalizeModels():

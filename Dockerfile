@@ -5,7 +5,6 @@ EXPOSE 80 443
 RUN apt-get clean \
     && apt-get -y update
 
-# Install requirements.txt
 RUN pip install flask --src /usr/local/src
 RUN pip install waitress --src /usr/local/src
 
