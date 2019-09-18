@@ -63,7 +63,7 @@ def runDataThroughNupic(MODELS, anomaly_helper, inputData, systemName):
     counter += 1
     timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
     for model_index in range(len(MODELS)):
-		data = float(row[model_index+1])
+		      data = float(row[model_index+1])
       		inference_type = MODEL_NAMES[model_index]
 
 	      	result = MODELS[model_index].run({
