@@ -63,24 +63,24 @@ def runDataThroughNupic(MODELS, anomaly_helper, inputData, systemName):
     counter += 1
     timestamp = datetime.datetime.strptime(row[0], DATE_FORMAT)
     for model_index in range(len(MODELS)):
-		      data = float(row[model_index+1])
-      		inference_type = MODEL_NAMES[model_index]
-
-	      	result = MODELS[model_index].run({
-          		"timestamp": timestamp,
-          		inference_type : data
-      			})
-
-      		if counter % 20 == 0:
-			      print(str(counter) + ":" + inference_type)
-
-	      	result = shifter.shift(result)
+      data = float(row[model_index+1])
+      inference_type = MODEL_NAMES[model_index]
       
-	      	prediction = result.inferences["multiStepBestPredictions"][1]
-      		anomalyScore = result.inferences["anomalyScore"]
-      		anomalyLikelihood = ANOMALY_OBJ.get_anomaly_likelihood(timestamp, data, prediction ,anomalyScore)
-			
-      		ANOMALY_LIKELIHOOD[model_index] = anomalyLikelihood
+      result = MODELS[model_index].run({
+        "timestamp": timestamp,
+        inference_type : data
+        })
+        
+      if counter % 20 == 0:
+        print(str(counter) + ":" + inference_type)
+        
+        result = shifter.shift(result)
+        
+        prediction = result.inferences["multiStepBestPredictions"][1]
+        anomalyScore = result.inferences["anomalyScore"]
+        anomalyLikelihood = ANOMALY_OBJ.get_anomaly_likelihood(timestamp, data, prediction ,anomalyScore)
+        
+        ANOMALY_LIKELIHOOD[model_index] = anomalyLikelihood
   
     ANOMALY_OBJ.write(timestamp,ANOMALY_LIKELIHOOD)
 
