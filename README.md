@@ -1,4 +1,4 @@
-# Network Anomaly Detection Model - MSC APICTA 2019
+# Brain Inspired User Behavioural Traffic Monitoring System - MSC APICTA 2019
 Numenta HTM model for Network Anomaly Detection
 
 
